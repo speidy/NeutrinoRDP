@@ -334,9 +334,9 @@ int credssp_sizeof_ts_password_creds(rdpCredssp* credssp)
 {
 	int length = 0;
 
-	length += ber_sizeof_sequence_octet_string(credssp->ntlmssp->domain.length * 2);
-	length += ber_sizeof_sequence_octet_string(credssp->ntlmssp->username.length * 2);
-	length += ber_sizeof_sequence_octet_string(credssp->ntlmssp->password.length * 2);
+	length += ber_sizeof_sequence_octet_string(credssp->ntlmssp->domain.length);
+	length += ber_sizeof_sequence_octet_string(credssp->ntlmssp->username.length);
+	length += ber_sizeof_sequence_octet_string(credssp->ntlmssp->password.length);
 
 	return length;
 }
@@ -355,13 +355,13 @@ int credssp_write_ts_password_creds(rdpCredssp* credssp, STREAM* s)
 	size += ber_write_sequence_tag(s, innerSize);
 
 	/* [0] domainName (OCTET STRING) */
-	size += ber_write_sequence_octet_string(s, 0, credssp->ntlmssp->domain.data, credssp->ntlmssp->domain.length * 2);
+	size += ber_write_sequence_octet_string(s, 0, credssp->ntlmssp->domain.data, credssp->ntlmssp->domain.length);
 
 	/* [1] userName (OCTET STRING) */
-	size += ber_write_sequence_octet_string(s, 1, credssp->ntlmssp->username.data, credssp->ntlmssp->username.length * 2);
+	size += ber_write_sequence_octet_string(s, 1, credssp->ntlmssp->username.data, credssp->ntlmssp->username.length);
 
 	/* [2] password (OCTET STRING) */
-	size += ber_write_sequence_octet_string(s, 2, credssp->ntlmssp->password.data, credssp->ntlmssp->password.length * 2);
+	size += ber_write_sequence_octet_string(s, 2, credssp->ntlmssp->password.data, credssp->ntlmssp->password.length);
 
 	return size;
 }
