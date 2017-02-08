@@ -111,9 +111,10 @@ tbool rdp_client_connect(rdpRdp* rdp)
 		return false;
 	}
 
-	rdp_set_blocking_mode(rdp, false);
 	rdp->state = CONNECTION_STATE_NEGO;
 	rdp->finalize_sc_pdus = 0;
+
+	rdp_set_blocking_mode(rdp, false);
 
 	LLOGLN(10, ("rdp_client_connect: calling mcs_send_connect_initial"));
 
