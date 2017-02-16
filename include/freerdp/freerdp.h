@@ -33,6 +33,7 @@ typedef struct rdp_freerdp_peer freerdp_peer;
 
 #include <freerdp/api.h>
 #include <freerdp/types.h>
+#include <freerdp/error.h>
 #include <freerdp/settings.h>
 #include <freerdp/extension.h>
 
@@ -61,7 +62,8 @@ struct rdp_context
 {
 	freerdp* instance; /* 0 */
 	freerdp_peer* peer; /* 1 */
-	uint32 paddingA[16 - 2]; /* 2 */
+	uint32 LastError; /* 2 */
+	uint32 paddingA[16 - 3]; /* 3 */
 
 	int argc; /* 16 */
 	char** argv; /* 17 */
@@ -124,6 +126,11 @@ FREERDP_API void freerdp_send_keep_alive(freerdp* instance);
 FREERDP_API uint32 freerdp_error_info(freerdp* instance);
 
 FREERDP_API void freerdp_get_version(int* major, int* minor, int* revision);
+
+FREERDP_API uint32 freerdp_get_last_error(rdpContext* context);
+FREERDP_API const char* freerdp_get_last_error_name(uint32 error);
+FREERDP_API const char* freerdp_get_last_error_string(uint32 error);
+FREERDP_API void freerdp_set_last_error(rdpContext* context, uint32 lastError);
 
 FREERDP_API freerdp* freerdp_new();
 FREERDP_API void freerdp_free(freerdp* instance);
