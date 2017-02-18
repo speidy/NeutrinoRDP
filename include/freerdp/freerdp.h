@@ -124,6 +124,7 @@ FREERDP_API boolean freerdp_check_fds(freerdp* instance);
 
 FREERDP_API void freerdp_send_keep_alive(freerdp* instance);
 FREERDP_API uint32 freerdp_error_info(freerdp* instance);
+FREERDP_API void freerdp_set_error_info(rdpRdp* rdp, uint32 error);
 
 FREERDP_API void freerdp_get_version(int* major, int* minor, int* revision);
 
