@@ -732,11 +732,11 @@ tbool rdp_set_error_info(rdpRdp* rdp, uint32 errorInfo)
 	if (rdp->errorInfo != ERRINFO_SUCCESS)
 	{
 		rdp_print_errinfo(rdp->errorInfo);
-		context->LastError = MAKE_FREERDP_ERROR(ERRINFO, errorInfo);
+		context->last_error = MAKE_FREERDP_ERROR(ERRINFO, errorInfo);
 	}
 	else
 	{
-		context->LastError = FREERDP_ERROR_SUCCESS;
+		context->last_error = FREERDP_ERROR_SUCCESS;
 	}
 
 	return true;

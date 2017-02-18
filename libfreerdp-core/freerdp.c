@@ -237,7 +237,7 @@ void freerdp_set_error_info(rdpRdp* rdp, uint32 error)
 
 uint32 freerdp_get_last_error(rdpContext* context)
 {
-    return context->LastError;
+    return context->last_error;
 }
 
 const char* freerdp_get_last_error_name(uint32 code)
@@ -309,7 +309,7 @@ void freerdp_set_last_error(rdpContext* context, uint32 lastError)
 //                 freerdp_get_last_error_name(context->LastError));
 //    }
 
-    context->LastError = lastError;
+    context->last_error = lastError;
 
     switch (lastError)
     {

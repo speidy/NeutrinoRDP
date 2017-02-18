@@ -62,7 +62,7 @@ struct rdp_context
 {
 	freerdp* instance; /* 0 */
 	freerdp_peer* peer; /* 1 */
-	uint32 LastError; /* 2 */
+	uint32 last_error; /* 2 */
 	uint32 paddingA[16 - 3]; /* 3 */
 
 	int argc; /* 16 */
