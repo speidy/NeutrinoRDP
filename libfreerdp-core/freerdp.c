@@ -34,9 +34,9 @@ tbool freerdp_connect(freerdp* instance)
 	rdpRdp* rdp;
 	tbool status = false;
 
-    /* We always set the return code to 0 before we start the connect sequence*/
-    connectErrorCode = 0;
-    freerdp_set_last_error(instance->context, FREERDP_ERROR_SUCCESS);
+	/* We always set the return code to 0 before we start the connect sequence */
+	connectErrorCode = 0;
+	freerdp_set_last_error(instance->context, FREERDP_ERROR_SUCCESS);
 
 	rdp = instance->context->rdp;
 
@@ -47,8 +47,8 @@ tbool freerdp_connect(freerdp* instance)
 	if (status == false)
 	{
 		printf("freerdp_pre_connect failed\n");
-        if (!freerdp_get_last_error(instance->context))
-            freerdp_set_last_error(instance->context, FREERDP_ERROR_PRE_CONNECT_FAILED);
+		if (!freerdp_get_last_error(instance->context))
+			freerdp_set_last_error(instance->context, FREERDP_ERROR_PRE_CONNECT_FAILED);
 		return false;
 	}
 
@@ -70,11 +70,11 @@ tbool freerdp_connect(freerdp* instance)
 		if (status == false)
 		{
 			printf("freerdp_post_connect failed\n");
-            if (!freerdp_get_last_error(instance->context))
-                freerdp_set_last_error(instance->context,
-                                       FREERDP_ERROR_POST_CONNECT_FAILED);
+			if (!freerdp_get_last_error(instance->context))
+				freerdp_set_last_error(instance->context, FREERDP_ERROR_POST_CONNECT_FAILED);
 			return false;
 		}
+
 
 		if (instance->settings->play_rfx)
 		{
@@ -107,6 +107,9 @@ tbool freerdp_connect(freerdp* instance)
 			xfree(s->data);
 			return true;
 		}
+
+		if (rdp->errorInfo == ERRINFO_SERVER_INSUFFICIENT_PRIVILEGES)
+			freerdp_set_last_error(instance->context, FREERDP_ERROR_INSUFFICIENT_PRIVILEGES);
 	}
 
 	return status;

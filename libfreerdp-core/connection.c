@@ -122,6 +122,8 @@ tbool rdp_client_connect(rdpRdp* rdp)
 	if (mcs_send_connect_initial(rdp->mcs) == false)
 	{
 		printf("Error: unable to send MCS Connect Initial\n");
+		if (!freerdp_get_last_error(rdp->instance->context))
+			freerdp_set_last_error(rdp->instance->context, FREERDP_ERROR_MCS_CONNECT_INITIAL_ERROR);
 		return false;
 	}
 

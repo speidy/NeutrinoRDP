@@ -92,7 +92,10 @@ int credssp_ntlmssp_init(rdpCredssp* credssp)
 			tbool proceed = instance->Authenticate(instance,
 					&settings->username, &settings->password, &settings->domain);
 			if (!proceed)
+			{
+				freerdp_set_last_error(instance->context, FREERDP_ERROR_CONNECT_CANCELLED);
 				return 0;
+			}
 		}
 	}
 
