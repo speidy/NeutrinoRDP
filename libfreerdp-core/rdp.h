@@ -211,4 +211,6 @@ void rdp_free(rdpRdp* rdp);
 
 boolean rdp_decrypt(rdpRdp* rdp, STREAM* s, int length, uint16 securityFlags);
 
+tbool rdp_set_error_info(rdpRdp* rdp, uint32 errorInfo);
+
 #endif /* __RDP_H */

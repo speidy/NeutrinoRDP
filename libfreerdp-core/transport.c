@@ -212,7 +212,8 @@ tbool transport_connect_nla(rdpTransport* transport)
 	{
 		printf("Authentication failure, check credentials.\n"
 			"If credentials are valid, the NTLMSSP implementation may be to blame.\n");
-
+		if (!freerdp_get_last_error(instance->context))
+			freerdp_set_last_error(instance->context, FREERDP_ERROR_AUTHENTICATION_FAILED);
 		credssp_free(transport->credssp);
 		return false;
 	}

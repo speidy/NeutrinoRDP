@@ -19,6 +19,8 @@
 
 #include "errinfo.h"
 
+int connectErrorCode;
+
 /* Protocol-independent codes */
 
 #define ERRINFO_RPC_INITIATED_DISCONNECT_STRING \
@@ -430,6 +432,44 @@ static const ERRINFO ERRINFO_CODES[] =
 
 		ERRINFO_DEFINE(NONE)
 };
+
+const char* freerdp_get_error_info_string(uint32 code)
+{
+    const ERRINFO* errInfo;
+
+    errInfo = &ERRINFO_CODES[0];
+
+    while (errInfo->code != ERRINFO_NONE)
+    {
+        if (code == errInfo->code)
+        {
+            return errInfo->info;
+        }
+
+        errInfo++;
+    }
+
+    return "Unknown error.";
+}
+
+const char* freerdp_get_error_info_name(uint32 code)
+{
+    const ERRINFO* errInfo;
+
+    errInfo = &ERRINFO_CODES[0];
+
+    while (errInfo->code != ERRINFO_NONE)
+    {
+        if (code == errInfo->code)
+        {
+            return errInfo->name;
+        }
+
+        errInfo++;
+    }
+
+    return "ERRINFO_UNKNOWN";
+}
 
 void rdp_print_errinfo(uint32 code)
 {

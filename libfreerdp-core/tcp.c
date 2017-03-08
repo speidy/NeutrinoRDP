@@ -125,6 +125,7 @@ tbool tcp_connect(rdpTcp* tcp, const char* hostname, uint16 port)
 	socklen_t option_len;
 	struct addrinfo hints = { 0 };
 	struct addrinfo * res, * ai;
+	rdpContext* context = (rdpContext*)((freerdp*)tcp->settings->instance)->context;
 
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_family = AF_UNSPEC;
@@ -135,6 +136,8 @@ tbool tcp_connect(rdpTcp* tcp, const char* hostname, uint16 port)
 
 	if (status != 0)
 	{
+		if (!freerdp_get_last_error(context))
+			freerdp_set_last_error(context, FREERDP_ERROR_DNS_NAME_NOT_FOUND);
 		printf("transport_connect: getaddrinfo (%s)\n", gai_strerror(status));
 		return false;
 	}
@@ -161,6 +164,8 @@ tbool tcp_connect(rdpTcp* tcp, const char* hostname, uint16 port)
 	if (tcp->sockfd == -1)
 	{
 		printf("unable to connect to %s:%s\n", hostname, servname);
+		if (!freerdp_get_last_error(context))
+			freerdp_set_last_error(context, FREERDP_ERROR_CONNECT_FAILED);
 		return false;
 	}
 

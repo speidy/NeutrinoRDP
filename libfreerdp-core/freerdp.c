@@ -27,11 +27,16 @@
 
 #include <freerdp/freerdp.h>
 #include <freerdp/utils/memory.h>
+#include <freerdp/error.h>
 
 tbool freerdp_connect(freerdp* instance)
 {
 	rdpRdp* rdp;
 	tbool status = false;
+
+	/* We always set the return code to 0 before we start the connect sequence */
+	connectErrorCode = 0;
+	freerdp_set_last_error(instance->context, FREERDP_ERROR_SUCCESS);
 
 	rdp = instance->context->rdp;
 
@@ -42,6 +47,8 @@ tbool freerdp_connect(freerdp* instance)
 	if (status == false)
 	{
 		printf("freerdp_pre_connect failed\n");
+		if (!freerdp_get_last_error(instance->context))
+			freerdp_set_last_error(instance->context, FREERDP_ERROR_PRE_CONNECT_FAILED);
 		return false;
 	}
 
@@ -63,8 +70,11 @@ tbool freerdp_connect(freerdp* instance)
 		if (status == false)
 		{
 			printf("freerdp_post_connect failed\n");
+			if (!freerdp_get_last_error(instance->context))
+				freerdp_set_last_error(instance->context, FREERDP_ERROR_POST_CONNECT_FAILED);
 			return false;
 		}
+
 
 		if (instance->settings->play_rfx)
 		{
@@ -97,6 +107,9 @@ tbool freerdp_connect(freerdp* instance)
 			xfree(s->data);
 			return true;
 		}
+
+		if (rdp->errorInfo == ERRINFO_SERVER_INSUFFICIENT_PRIVILEGES)
+			freerdp_set_last_error(instance->context, FREERDP_ERROR_INSUFFICIENT_PRIVILEGES);
 	}
 
 	return status;
@@ -212,6 +225,146 @@ void freerdp_context_free(freerdp* instance)
 uint32 freerdp_error_info(freerdp* instance)
 {
 	return instance->context->rdp->errorInfo;
+}
+
+void freerdp_set_error_info(rdpRdp* rdp, uint32 error)
+{
+	if (!rdp)
+		return;
+
+	rdp_set_error_info(rdp, error);
+}
+
+uint32 freerdp_get_last_error(rdpContext* context)
+{
+    return context->last_error;
+}
+
+const char* freerdp_get_last_error_name(uint32 code)
+{
+    const char* name = NULL;
+    const uint32 cls = GET_FREERDP_ERROR_CLASS(code);
+    const uint32 type = GET_FREERDP_ERROR_TYPE(code);
+
+    switch (cls)
+    {
+        case FREERDP_ERROR_ERRBASE_CLASS:
+            name = freerdp_get_error_base_name(type);
+            break;
+
+        case FREERDP_ERROR_ERRINFO_CLASS:
+            name = freerdp_get_error_info_name(type);
+            break;
+
+        case FREERDP_ERROR_CONNECT_CLASS:
+            name = freerdp_get_error_connect_name(type);
+            break;
+
+        default:
+            name = "Unknown error class";
+            break;
+    }
+
+    return name;
+}
+
+const char* freerdp_get_last_error_string(uint32 code)
+{
+    const char* string = NULL;
+    const uint32 cls = GET_FREERDP_ERROR_CLASS(code);
+    const uint32 type = GET_FREERDP_ERROR_TYPE(code);
+
+    switch (cls)
+    {
+        case FREERDP_ERROR_ERRBASE_CLASS:
+            string = freerdp_get_error_base_string(type);
+            break;
+
+        case FREERDP_ERROR_ERRINFO_CLASS:
+            string = freerdp_get_error_info_string(type);
+            break;
+
+        case FREERDP_ERROR_CONNECT_CLASS:
+            string = freerdp_get_error_connect_string(type);
+            break;
+
+        default:
+            string = "Unknown error class";
+            break;
+    }
+
+    return string;
+}
+
+void freerdp_set_last_error(rdpContext* context, uint32 lastError)
+{
+//    if (lastError)
+//        WLog_ERR(TAG, "freerdp_set_last_error %s [0x%08"PRIX32"]",
+//                 freerdp_get_last_error_name(lastError), lastError);
+
+//    if (context->LastError != 0)
+//    {
+//        WLog_ERR(TAG, "TODO: Trying to set error code %s, but %s already set!",
+//                 freerdp_get_last_error_name(lastError),
+//                 freerdp_get_last_error_name(context->LastError));
+//    }
+
+    context->last_error = lastError;
+
+    switch (lastError)
+    {
+        case FREERDP_ERROR_PRE_CONNECT_FAILED:
+            connectErrorCode = PREECONNECTERROR;
+            break;
+
+        case FREERDP_ERROR_CONNECT_UNDEFINED:
+            connectErrorCode = UNDEFINEDCONNECTERROR;
+            break;
+
+        case FREERDP_ERROR_POST_CONNECT_FAILED:
+            connectErrorCode = POSTCONNECTERROR;
+            break;
+
+        case FREERDP_ERROR_DNS_ERROR:
+            connectErrorCode = DNSERROR;
+            break;
+
+        case FREERDP_ERROR_DNS_NAME_NOT_FOUND:
+            connectErrorCode = DNSNAMENOTFOUND;
+            break;
+
+        case FREERDP_ERROR_CONNECT_FAILED:
+            connectErrorCode = CONNECTERROR;
+            break;
+
+        case FREERDP_ERROR_MCS_CONNECT_INITIAL_ERROR:
+            connectErrorCode = MCSCONNECTINITIALERROR;
+            break;
+
+        case FREERDP_ERROR_TLS_CONNECT_FAILED:
+            connectErrorCode = TLSCONNECTERROR;
+            break;
+
+        case FREERDP_ERROR_AUTHENTICATION_FAILED:
+            connectErrorCode = AUTHENTICATIONERROR;
+            break;
+
+        case FREERDP_ERROR_INSUFFICIENT_PRIVILEGES:
+            connectErrorCode = INSUFFICIENTPRIVILEGESERROR;
+            break;
+
+        case FREERDP_ERROR_CONNECT_CANCELLED:
+            connectErrorCode = CANCELEDBYUSER;
+            break;
+
+        case FREERDP_ERROR_SECURITY_NEGO_CONNECT_FAILED:
+            connectErrorCode = CONNECTERROR;
+            break;
+
+        case FREERDP_ERROR_CONNECT_TRANSPORT_FAILED:
+            connectErrorCode = CONNECTERROR;
+            break;
+    }
 }
 
 freerdp* freerdp_new()
