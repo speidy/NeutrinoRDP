@@ -46,6 +46,8 @@ set(LIBFREERDP_CORE_SRCS
 	ntlmssp.h
 	license.c
 	license.h
+	errbase.c
+	errconnect.c
 	errinfo.c
 	errinfo.h
 	security.c

@@ -33,6 +33,7 @@ static int g_total_read = 0;
 tbool tls_connect(rdpTls* tls)
 {
 	int connection_status;
+	rdpContext* context = (rdpContext*)((freerdp*)tls->settings->instance)->context;
 
 	LLOGLN(10, ("tls_connect:"));
 	tls->ctx = SSL_CTX_new(TLSv1_client_method());
@@ -71,6 +72,8 @@ tbool tls_connect(rdpTls* tls)
 
 	if (connection_status <= 0)
 	{
+		if (!freerdp_get_last_error(context))
+			freerdp_set_last_error(context, FREERDP_ERROR_TLS_CONNECT_FAILED);
 		if (tls_print_error("SSL_connect", tls->ssl, connection_status))
 			return false;
 	}

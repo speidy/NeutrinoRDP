@@ -247,6 +247,20 @@ tbool rdp_read_header(rdpRdp* rdp, STREAM* s, uint16* length, uint16* channel_id
 			LLOGLN(0, ("rdp_read_header: per_read_enumerated failed"));
 			return false;
 		}
+		if (rdp->errorInfo == ERRINFO_SUCCESS)
+		{
+			/**
+			 * Some servers like Windows Server 2008 R2 do not send the error info pdu
+			 * when the user logs off like they should. Map DisconnectProviderUltimatum
+			 * to a ERRINFO_LOGOFF_BY_USER when the errinfo code is ERRINFO_SUCCESS.
+			 */
+			if (reason == MCS_Reason_provider_initiated)
+				rdp_set_error_info(rdp, ERRINFO_RPC_INITIATED_DISCONNECT);
+			else if (reason == MCS_Reason_user_requested)
+				rdp_set_error_info(rdp, ERRINFO_LOGOFF_BY_USER);
+			else
+				rdp_set_error_info(rdp, ERRINFO_RPC_INITIATED_DISCONNECT);
+		}
 		rdp->disconnect = true;
 		*channel_id = MCS_GLOBAL_CHANNEL_ID;
 		return true;
@@ -475,9 +489,7 @@ tbool rdp_send_data_pdu(rdpRdp* rdp, STREAM* s, uint8 type, uint16 channel_id)
 void rdp_recv_set_error_info_data_pdu(rdpRdp* rdp, STREAM* s)
 {
 	stream_read_uint32(s, rdp->errorInfo); /* errorInfo (4 bytes) */
-
-	if (rdp->errorInfo != ERRINFO_SUCCESS)
-		rdp_print_errinfo(rdp->errorInfo);
+	rdp_set_error_info(rdp, rdp->errorInfo);
 }
 
 tbool rdp_recv_data_pdu(rdpRdp* rdp, STREAM* s)
@@ -708,6 +720,25 @@ tbool rdp_decrypt(rdpRdp* rdp, STREAM* s, int length, uint16 securityFlags)
 	{
 		LLOGLN(10, ("rdp_decrypt: signature ok"));
 	}
+	return true;
+}
+
+tbool rdp_set_error_info(rdpRdp* rdp, uint32 errorInfo)
+{
+	rdpContext* context = rdp->instance->context;
+
+	rdp->errorInfo = errorInfo;
+
+	if (rdp->errorInfo != ERRINFO_SUCCESS)
+	{
+		rdp_print_errinfo(rdp->errorInfo);
+		context->last_error = MAKE_FREERDP_ERROR(ERRINFO, errorInfo);
+	}
+	else
+	{
+		context->last_error = FREERDP_ERROR_SUCCESS;
+	}
+
 	return true;
 }
 

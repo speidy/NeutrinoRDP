@@ -30,6 +30,7 @@
 
 #include <freerdp/settings.h>
 #include <freerdp/utils/memory.h>
+#include <freerdp/error.h>
 
 enum CONNECTION_STATE
 {
