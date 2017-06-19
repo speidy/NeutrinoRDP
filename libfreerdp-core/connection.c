@@ -81,8 +81,7 @@ tbool rdp_client_connect(rdpRdp* rdp)
 	if (nego_connect(rdp->nego) == false)
 	{
 		printf("Error: protocol security negotiation failure\n");
-		if (!freerdp_get_last_error(rdp->instance->context))
-			freerdp_set_last_error(rdp->instance->context, FREERDP_ERROR_SECURITY_NEGO_CONNECT_FAILED);
+		freerdp_set_last_error(rdp->instance->context, FREERDP_ERROR_SECURITY_NEGO_CONNECT_FAILED);
 		return false;
 	}
 
@@ -111,8 +110,7 @@ tbool rdp_client_connect(rdpRdp* rdp)
 	if (status == false)
 	{
 		printf("Error: transport connect failure\n");
-		if (!freerdp_get_last_error(rdp->instance->context))
-			freerdp_set_last_error(rdp->instance->context, FREERDP_ERROR_CONNECT_TRANSPORT_FAILED);
+		freerdp_set_last_error(rdp->instance->context, FREERDP_ERROR_CONNECT_TRANSPORT_FAILED);
 		return false;
 	}
 
