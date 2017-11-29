@@ -35,12 +35,16 @@
 #define AVMEDIA_TYPE_AUDIO 1
 #endif
 
+#ifndef AVCODEC_MAX_AUDIO_FRAME_SIZE
+#define AVCODEC_MAX_AUDIO_FRAME_SIZE 192000 // 1 second of 48khz 32bit audio
+#endif
+
 typedef struct _TSMFFFmpegDecoder
 {
 	ITSMFDecoder iface;
 
 	int media_type;
-	enum CodecID codec_id;
+	enum AVCodecID codec_id;
 	AVCodecContext* codec_context;
 	AVCodec* codec;
 	AVFrame* frame;
@@ -90,7 +94,11 @@ static tbool tsmf_ffmpeg_init_audio_stream(ITSMFDecoder* decoder, const TS_AM_ME
 	mdecoder->codec_context->block_align = media_type->BlockAlign;
 
 #ifdef AV_CPU_FLAG_SSE2
+#if LIBAVCODEC_VERSION_MAJOR < 55
 	mdecoder->codec_context->dsp_mask = AV_CPU_FLAG_SSE2 | AV_CPU_FLAG_MMX2;
+#else
+	av_set_cpu_flags_mask(AV_CPU_FLAG_SSE2 | AV_CPU_FLAG_MMX2);
+#endif
 #else
 #if LIBAVCODEC_VERSION_MAJOR < 53
 	mdecoder->codec_context->dsp_mask = FF_MM_SSE2 | FF_MM_MMXEXT;
@@ -411,7 +419,7 @@ static tbool tsmf_ffmpeg_decode_audio(ITSMFDecoder* decoder, const uint8* data, 
 			}
 			dst += mdecoder->decoded_size;
 		}
-		
+
 		frame_size = mdecoder->decoded_size_max - mdecoder->decoded_size;
 #if LIBAVCODEC_VERSION_MAJOR < 52 || (LIBAVCODEC_VERSION_MAJOR == 52 && LIBAVCODEC_VERSION_MINOR <= 20)
 		len = avcodec_decode_audio2(mdecoder->codec_context,
@@ -425,14 +433,14 @@ static tbool tsmf_ffmpeg_decode_audio(ITSMFDecoder* decoder, const uint8* data, 
 			pkt.data = (uint8*) src;
 			pkt.size = src_size;
 			len = avcodec_decode_audio4(mdecoder->codec_context, decoded_frame, &got_frame, &pkt);
-			
+
 			if (len >= 0 && got_frame)
 			{
 	            frame_size = av_samples_get_buffer_size(NULL, mdecoder->codec_context->channels,
 					decoded_frame->nb_samples, mdecoder->codec_context->sample_fmt, 1);
 				memcpy(dst, decoded_frame->data[0], frame_size);
 			}
-			
+
 			av_free(decoded_frame);
 		}
 #endif
