@@ -175,7 +175,7 @@ void rdp_write_client_time_zone(STREAM* s, rdpSettings* settings)
 	size_t daylightNameLength;
 	TIME_ZONE_INFO* clientTimeZone;
 
-	rdp_get_client_time_zone(s, settings);
+//	rdp_get_client_time_zone(s, settings);
 	clientTimeZone = settings->client_time_zone;
 
 	standardName = (uint8*) freerdp_uniconv_out(settings->uniconv, clientTimeZone->standardName, &length);
