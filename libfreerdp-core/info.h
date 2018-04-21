@@ -72,7 +72,6 @@
 
 void rdp_read_system_time(STREAM* s, SYSTEM_TIME* system_time);
 void rdp_write_system_time(STREAM* s, SYSTEM_TIME* system_time);
-void rdp_get_client_time_zone(STREAM* s, rdpSettings* settings);
 boolean rdp_read_client_time_zone(STREAM* s, rdpSettings* settings);
 void rdp_write_client_time_zone(STREAM* s, rdpSettings* settings);
 void rdp_read_server_auto_reconnect_cookie(STREAM* s, rdpSettings* settings);

@@ -52,6 +52,7 @@
 #include <freerdp/utils/event.h>
 #include <freerdp/utils/signal.h>
 #include <freerdp/utils/passphrase.h>
+#include <freerdp/utils/time.h>
 #include <freerdp/plugins/cliprdr.h>
 #include <freerdp/rail.h>
 
@@ -508,6 +509,8 @@ tbool xf_pre_connect(freerdp* instance)
 	settings->order_support[NEG_ELLIPSE_CB_INDEX] = false;
 
 	freerdp_channels_pre_connect(xfi->_context->channels, instance);
+
+	time_set_client_time_zone(settings);
 
 	xfi->display = XOpenDisplay(NULL);
 

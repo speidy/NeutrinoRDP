@@ -73,53 +73,6 @@ void rdp_write_system_time(STREAM* s, SYSTEM_TIME* system_time)
 }
 
 /**
- * Get client time zone information.\n
- * @param s stream
- * @param settings settings
- */
-
-void rdp_get_client_time_zone(STREAM* s, rdpSettings* settings)
-{
-	time_t t;
-	struct tm* local_time;
-	TIME_ZONE_INFO* clientTimeZone;
-
-	time(&t);
-	local_time = localtime(&t);
-	clientTimeZone = settings->client_time_zone;
-
-#if defined(sun)
-	if(local_time->tm_isdst > 0)
-		clientTimeZone->bias = (uint32) (altzone / 3600);
-	else
-		clientTimeZone->bias = (uint32) (timezone / 3600);
-#elif defined(HAVE_TM_GMTOFF)
-	if(local_time->tm_gmtoff >= 0)
-		clientTimeZone->bias = (uint32) (local_time->tm_gmtoff / 60);
-	else
-		clientTimeZone->bias = (uint32) ((-1 * local_time->tm_gmtoff) / 60 + 720);
-#else
-	clientTimeZone->bias = 0;
-#endif
-
-	if(local_time->tm_isdst > 0)
-	{
-		clientTimeZone->standardBias = clientTimeZone->bias - 60;
-		clientTimeZone->daylightBias = clientTimeZone->bias;
-	}
-	else
-	{
-		clientTimeZone->standardBias = clientTimeZone->bias;
-		clientTimeZone->daylightBias = clientTimeZone->bias + 60;
-	}
-
-	strftime(clientTimeZone->standardName, 32, "%Z, Standard Time", local_time);
-	clientTimeZone->standardName[31] = 0;
-	strftime(clientTimeZone->daylightName, 32, "%Z, Summer Time", local_time);
-	clientTimeZone->daylightName[31] = 0;
-}
-
-/**
  * Read client time zone information (TS_TIME_ZONE_INFORMATION).\n
  * @msdn{cc240477}
  * @param s stream
@@ -175,7 +128,6 @@ void rdp_write_client_time_zone(STREAM* s, rdpSettings* settings)
 	size_t daylightNameLength;
 	TIME_ZONE_INFO* clientTimeZone;
 
-	rdp_get_client_time_zone(s, settings);
 	clientTimeZone = settings->client_time_zone;
 
 	standardName = (uint8*) freerdp_uniconv_out(settings->uniconv, clientTimeZone->standardName, &length);

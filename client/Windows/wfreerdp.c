@@ -34,6 +34,7 @@
 #include <freerdp/utils/args.h>
 #include <freerdp/utils/event.h>
 #include <freerdp/utils/memory.h>
+#include <freerdp/utils/time.h>
 #include <freerdp/channels/channels.h>
 
 #include "wf_gdi.h"
@@ -209,6 +210,9 @@ tbool wf_pre_connect(freerdp* instance)
 	}
 
 	settings->kbd_layout = (int) GetKeyboardLayout(0) & 0x0000FFFF;
+
+	time_set_client_time_zone(settings);
+
 	freerdp_channels_pre_connect(instance->context->channels, instance);
 
 	return true;

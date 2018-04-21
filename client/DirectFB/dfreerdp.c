@@ -24,6 +24,7 @@
 #include <freerdp/utils/memory.h>
 #include <freerdp/utils/semaphore.h>
 #include <freerdp/utils/event.h>
+#include <freerdp/utils/time.h>
 #include <freerdp/constants.h>
 #include <freerdp/plugins/cliprdr.h>
 
@@ -153,6 +154,8 @@ tbool df_pre_connect(freerdp* instance)
 	dfi->clrconv->invert = 0;
 	dfi->clrconv->rgb555 = 0;
 	dfi->clrconv->palette = xnew(rdpPalette);
+
+	time_set_client_time_zone(settings);
 
 	freerdp_channels_pre_connect(instance->context->channels, instance);
 
